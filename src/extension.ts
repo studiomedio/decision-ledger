@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { AdrIndex } from './core/adrIndex'
 import { AdrCodeLensProvider } from './providers/codeLens'
+import { AdrHoverProvider } from './providers/hover'
 import { AdrTreeProvider } from './providers/tree'
 import { StatusBar } from './statusBar'
 import { registerCommands } from './commands'
@@ -17,9 +18,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.registerTreeDataProvider('decisionLedger.records', treeProvider),
   )
 
+  // dl:adr 0002
   const codeLensProvider = new AdrCodeLensProvider(index)
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider({ scheme: 'file' }, codeLensProvider),
+  )
+
+  const hoverProvider = new AdrHoverProvider(index)
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider({ scheme: 'file' }, hoverProvider),
   )
 
   registerCommands(context, index)

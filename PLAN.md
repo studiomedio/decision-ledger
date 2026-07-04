@@ -90,11 +90,13 @@ docs/adr/                   # Decision Ledger's own ADRs (dogfooding)
 
 ## Roadmap
 
-- **Phase 1 — MVP (this milestone):** index + watcher, Tree View, New/Open ADR, Show-file-decisions,
+- **Phase 1 — MVP ✅ shipped:** index + watcher, Tree View, New/Open ADR, Show-file-decisions,
   CodeLens from `applies-to` globs, status-bar count. End-to-end and testable.
-- **Phase 2 — precision:** inline anchors (`// dl:adr NNNN`), symbol-level CodeLens + hover,
-  "Link selection to ADR" command, Comment-Thread card prototype.
-- **Phase 3 — lifecycle:** staleness diagnostics, supersedes-chain view, full-text/semantic search,
+- **Phase 2 — precision ✅ shipped:** inline anchors (`// dl:adr NNNN`, multi-id, language-aware),
+  symbol-level CodeLens + rich hover, "Link Selection to Decision Record" command. *Deferred:*
+  Comment-Thread inline "card" prototype (evaluate vs. hover+lens before building).
+- **Phase 3 — lifecycle:** staleness diagnostics (incl. unresolved-anchor warnings),
+  supersedes-chain view, full-text/semantic search,
   webview read view.
 - **Phase 4 — ecosystem:** shared core extracted for a CLI + the web app; CI drift checks.
 

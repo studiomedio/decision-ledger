@@ -2,6 +2,8 @@ import * as vscode from 'vscode'
 import type { AdrIndex } from '../core/adrIndex'
 import type { Adr } from '../types/adr'
 import { nextId, slugify } from '../core/ids'
+import { primaryKeyword } from '../core/anchors'
+import { wrapComment } from '../core/comments'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder('utf-8')
@@ -98,6 +100,34 @@ async function showFileDecisions(index: AdrIndex): Promise<void> {
   if (picked) await openRecord(index, picked.id)
 }
 
+async function linkSelection(index: AdrIndex): Promise<void> {
+  const editor = vscode.window.activeTextEditor
+  if (!editor) return
+
+  const adrs = index.all()
+  if (adrs.length === 0) {
+    void vscode.window.showInformationMessage(
+      'Decision Ledger: create a record first, then link code to it.',
+    )
+    return
+  }
+
+  const picked = await vscode.window.showQuickPick(quickPickItems(adrs), {
+    placeHolder: 'Link this code to a decision record',
+    matchOnDescription: true,
+    matchOnDetail: true,
+  })
+  if (!picked) return
+
+  const line = editor.document.lineAt(editor.selection.start.line)
+  const indent = line.text.slice(0, line.firstNonWhitespaceCharacterIndex)
+  const comment = wrapComment(editor.document.languageId, `${primaryKeyword()} ${picked.id}`)
+
+  await editor.edit((builder) => {
+    builder.insert(new vscode.Position(line.lineNumber, 0), `${indent}${comment}\n`)
+  })
+}
+
 export function registerCommands(context: vscode.ExtensionContext, index: AdrIndex): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('decisionLedger.newAdr', () => newAdr(context, index)),
@@ -108,6 +138,7 @@ export function registerCommands(context: vscode.ExtensionContext, index: AdrInd
     vscode.commands.registerCommand('decisionLedger.showFileDecisions', () =>
       showFileDecisions(index),
     ),
+    vscode.commands.registerCommand('decisionLedger.linkSelection', () => linkSelection(index)),
     vscode.commands.registerCommand('decisionLedger.refresh', () => index.refresh()),
   )
 }

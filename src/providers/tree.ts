@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import type { AdrIndex } from '../core/adrIndex'
 import type { Adr, AdrStatus } from '../types/adr'
 import { ADR_STATUSES } from '../types/adr'
+import { STATUS_THEME_ICON } from '../core/format'
 
 interface StatusGroup {
   kind: 'group'
@@ -21,13 +22,6 @@ const STATUS_LABEL: Record<AdrStatus, string> = {
   proposed: 'Proposed',
   superseded: 'Superseded',
   deprecated: 'Deprecated',
-}
-
-const STATUS_THEME_ICON: Record<AdrStatus, string> = {
-  accepted: 'check',
-  proposed: 'circle-outline',
-  superseded: 'history',
-  deprecated: 'warning',
 }
 
 export class AdrTreeProvider implements vscode.TreeDataProvider<Node> {
