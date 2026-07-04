@@ -1,0 +1,141 @@
+{
+  "name": "decision-ledger",
+  "displayName": "Decision Ledger",
+  "description": "Surface Architectural Decision Records in the context of the code they govern.",
+  "version": "0.1.0",
+  "publisher": "studiomedio",
+  "license": "MIT",
+  "homepage": "https://decisionledger.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/studiomedio/decision-ledger"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "adr",
+    "architecture",
+    "decision record",
+    "madr",
+    "documentation"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Decision Ledger",
+      "properties": {
+        "decisionLedger.folder": {
+          "type": "string",
+          "default": "docs/adr",
+          "description": "Workspace-relative folder where ADR markdown files live."
+        },
+        "decisionLedger.fileGlob": {
+          "type": "string",
+          "default": "**/*.md",
+          "description": "Glob (relative to the ADR folder) matching record files."
+        },
+        "decisionLedger.codeLens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a CodeLens at the top of files governed by an ADR."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "decisionLedger",
+          "title": "Decision Ledger",
+          "icon": "media/ledger.svg"
+        }
+      ]
+    },
+    "views": {
+      "decisionLedger": [
+        {
+          "id": "decisionLedger.records",
+          "name": "Decisions",
+          "icon": "media/ledger.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "decisionLedger.records",
+        "contents": "No decision records found in this workspace.\n[New Decision Record](command:decisionLedger.newAdr)\nRecords are markdown files in [docs/adr](command:workbench.action.openSettings?%22decisionLedger.folder%22)."
+      }
+    ],
+    "commands": [
+      {
+        "command": "decisionLedger.newAdr",
+        "title": "New Decision Record",
+        "category": "Decision Ledger",
+        "icon": "$(add)"
+      },
+      {
+        "command": "decisionLedger.openAdr",
+        "title": "Open Decision Record…",
+        "category": "Decision Ledger"
+      },
+      {
+        "command": "decisionLedger.showFileDecisions",
+        "title": "Show Decisions for This File",
+        "category": "Decision Ledger"
+      },
+      {
+        "command": "decisionLedger.refresh",
+        "title": "Refresh",
+        "category": "Decision Ledger",
+        "icon": "$(refresh)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "decisionLedger.newAdr",
+          "when": "view == decisionLedger.records",
+          "group": "navigation@1"
+        },
+        {
+          "command": "decisionLedger.refresh",
+          "when": "view == decisionLedger.records",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "decisionLedger.refresh",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "minimatch": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0",
+    "@vscode/vsce": "^3.2.0"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}
