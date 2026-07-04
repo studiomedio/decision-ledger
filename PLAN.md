@@ -95,10 +95,11 @@ docs/adr/                   # Decision Ledger's own ADRs (dogfooding)
 - **Phase 2 — precision ✅ shipped:** inline anchors (`// dl:adr NNNN`, multi-id, language-aware),
   symbol-level CodeLens + rich hover, "Link Selection to Decision Record" command. *Deferred:*
   Comment-Thread inline "card" prototype (evaluate vs. hover+lens before building).
-- **Phase 3 — lifecycle:** staleness diagnostics (incl. unresolved-anchor warnings),
-  supersedes-chain view, full-text/semantic search,
-  webview read view.
-- **Phase 4 — ecosystem:** shared core extracted for a CLI + the web app; CI drift checks.
+- **Phase 3 — lifecycle ✅ shipped:** staleness + dangling-anchor diagnostics, supersedes-chain
+  (index + hover + read view), full-text search, themed webview read view. *Deferred:* semantic
+  search (needs an embedding model — revisit once the CLI/web app share a core).
+- **Phase 4 — ecosystem:** shared core extracted for a CLI + the web app; CI drift checks;
+  semantic search.
 
 ## Dogfooding
 

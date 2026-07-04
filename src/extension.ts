@@ -3,6 +3,8 @@ import { AdrIndex } from './core/adrIndex'
 import { AdrCodeLensProvider } from './providers/codeLens'
 import { AdrHoverProvider } from './providers/hover'
 import { AdrTreeProvider } from './providers/tree'
+import { AdrPreview } from './providers/preview'
+import { DiagnosticsManager } from './providers/diagnostics'
 import { StatusBar } from './statusBar'
 import { registerCommands } from './commands'
 
@@ -28,6 +30,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(
     vscode.languages.registerHoverProvider({ scheme: 'file' }, hoverProvider),
   )
+
+  const preview = new AdrPreview(index)
+  context.subscriptions.push(
+    preview,
+    // Invoked with a string id (hover / command), or a tree node (view/item/context).
+    vscode.commands.registerCommand('decisionLedger.preview', (arg: unknown) => {
+      const id =
+        typeof arg === 'string'
+          ? arg
+          : (arg as { adr?: { id?: string } })?.adr?.id
+      if (id) preview.show(id)
+    }),
+  )
+
+  const diagnostics = new DiagnosticsManager(index)
+  context.subscriptions.push(diagnostics)
 
   registerCommands(context, index)
 

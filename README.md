@@ -11,10 +11,15 @@ govern. Records stay as plain markdown in your repo — [decisionledger.dev](htt
 - **Hover** — a rich tooltip (status, deciders, summary, open link) on an inline anchor.
 - **Link Selection to Decision Record** — inserts a language-aware anchor comment above the
   current line, so precise links move with the code through refactors.
+- **Diagnostics** (Problems panel) — warns about dangling anchors (`dl:adr` pointing at a missing
+  record) and code governed by a superseded/deprecated record.
+- **Read view** — a themed webview rendering the record with its status, metadata, and a clickable
+  supersedes/superseded-by chain.
+- **Full-text search** across id, title, tags, deciders, and body.
 - **Decisions** view in the activity bar — every record grouped by status.
 - **Status bar** count of decisions governing the active file.
 - **Commands:** New Decision Record (from template), Open Decision Record, Show Decisions for This
-  File, Link Selection to Decision Record.
+  File, Link Selection to Decision Record, Search Decision Records, Open Preview.
 
 Records are MADR-style markdown files in `docs/adr/` (configurable). Markdown is the only source of
 truth; the extension keeps a disposable in-memory index warmed by a file watcher.
@@ -51,6 +56,7 @@ applies-to:
 | `decisionLedger.fileGlob` | `**/*.md` | Which files in it are records |
 | `decisionLedger.codeLens.enabled` | `true` | Toggle the file CodeLens |
 | `decisionLedger.anchor.keywords` | `["dl:adr", "@adr"]` | Keywords that mark an inline anchor |
+| `decisionLedger.diagnostics.enabled` | `true` | Toggle Problems-panel warnings |
 
 ## Develop
 

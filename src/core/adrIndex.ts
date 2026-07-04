@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import { minimatch } from 'minimatch'
-import type { Adr } from '../types/adr'
+import type { Adr, AdrChain } from '../types/adr'
 import { parseAdr } from './parser'
 
 const decoder = new TextDecoder('utf-8')
@@ -106,6 +106,39 @@ export class AdrIndex implements vscode.Disposable {
     return this.all().filter((adr) =>
       adr.appliesTo.some((glob) => minimatch(rel, glob, { dot: true })),
     )
+  }
+
+  /** Supersession relationships for a record, resolved to known records. */
+  chain(id: string): AdrChain {
+    const adr = this.records.get(id)
+    return {
+      supersedes: (adr?.supersedes ?? [])
+        .map((sid) => this.records.get(sid))
+        .filter((a): a is Adr => a !== undefined),
+      supersededBy: this.all().filter((a) => a.supersedes.includes(id)),
+    }
+  }
+
+  /** Rank records against a free-text query across id, title, tags, and body. */
+  search(query: string): Adr[] {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+    if (terms.length === 0) return this.all()
+    const scored: { adr: Adr; score: number }[] = []
+    for (const adr of this.records.values()) {
+      const hay = {
+        title: adr.title.toLowerCase(),
+        rest: `${adr.id} ${adr.tags.join(' ')} ${adr.deciders.join(' ')} ${adr.body}`.toLowerCase(),
+      }
+      let score = 0
+      let matchedAll = true
+      for (const term of terms) {
+        if (hay.title.includes(term)) score += 3
+        else if (hay.rest.includes(term)) score += 1
+        else matchedAll = false
+      }
+      if (matchedAll) scored.push({ adr, score })
+    }
+    return scored.sort((a, b) => b.score - a.score || b.adr.id.localeCompare(a.adr.id)).map((s) => s.adr)
   }
 
   private disposeWatchers(): void {

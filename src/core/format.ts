@@ -25,3 +25,8 @@ export function lensTitle(adr: Adr): string {
 export function openRecordCommandUri(id: string): string {
   return `command:decisionLedger.openRecord?${encodeURIComponent(JSON.stringify([id]))}`
 }
+
+/** URI that opens the read-view webview for an id. */
+export function previewCommandUri(id: string): string {
+  return `command:decisionLedger.preview?${encodeURIComponent(JSON.stringify([id]))}`
+}

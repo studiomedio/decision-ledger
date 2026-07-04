@@ -100,6 +100,24 @@ async function showFileDecisions(index: AdrIndex): Promise<void> {
   if (picked) await openRecord(index, picked.id)
 }
 
+function searchAdrs(index: AdrIndex): void {
+  const qp = vscode.window.createQuickPick<vscode.QuickPickItem & { id: string }>()
+  qp.placeholder = 'Search decision records — title, tags, deciders, body…'
+  const toItems = (adrs: ReturnType<AdrIndex['all']>) =>
+    quickPickItems(adrs).map((i) => ({ ...i, alwaysShow: true }))
+  qp.items = toItems(index.search(''))
+  qp.onDidChangeValue((value) => {
+    qp.items = toItems(index.search(value))
+  })
+  qp.onDidAccept(() => {
+    const picked = qp.selectedItems[0]
+    if (picked) void openRecord(index, picked.id)
+    qp.hide()
+  })
+  qp.onDidHide(() => qp.dispose())
+  qp.show()
+}
+
 async function linkSelection(index: AdrIndex): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) return
@@ -139,6 +157,7 @@ export function registerCommands(context: vscode.ExtensionContext, index: AdrInd
       showFileDecisions(index),
     ),
     vscode.commands.registerCommand('decisionLedger.linkSelection', () => linkSelection(index)),
+    vscode.commands.registerCommand('decisionLedger.search', () => searchAdrs(index)),
     vscode.commands.registerCommand('decisionLedger.refresh', () => index.refresh()),
   )
 }

@@ -51,6 +51,11 @@
           "items": { "type": "string" },
           "default": ["dl:adr", "@adr"],
           "description": "Keywords that mark an inline ADR anchor in a code comment, e.g. `// dl:adr 0042`."
+        },
+        "decisionLedger.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn in the Problems panel about dangling anchors and code governed by superseded/deprecated records."
         }
       }
     },
@@ -101,6 +106,18 @@
         "category": "Decision Ledger"
       },
       {
+        "command": "decisionLedger.search",
+        "title": "Search Decision Records",
+        "category": "Decision Ledger",
+        "icon": "$(search)"
+      },
+      {
+        "command": "decisionLedger.preview",
+        "title": "Open Preview",
+        "category": "Decision Ledger",
+        "icon": "$(open-preview)"
+      },
+      {
         "command": "decisionLedger.refresh",
         "title": "Refresh",
         "category": "Decision Ledger",
@@ -110,6 +127,11 @@
     "menus": {
       "view/title": [
         {
+          "command": "decisionLedger.search",
+          "when": "view == decisionLedger.records",
+          "group": "navigation@0"
+        },
+        {
           "command": "decisionLedger.newAdr",
           "when": "view == decisionLedger.records",
           "group": "navigation@1"
@@ -118,6 +140,13 @@
           "command": "decisionLedger.refresh",
           "when": "view == decisionLedger.records",
           "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "decisionLedger.preview",
+          "when": "view == decisionLedger.records && viewItem == adrRecord",
+          "group": "inline"
         }
       ],
       "editor/context": [
@@ -130,6 +159,10 @@
       "commandPalette": [
         {
           "command": "decisionLedger.refresh",
+          "when": "false"
+        },
+        {
+          "command": "decisionLedger.preview",
           "when": "false"
         }
       ]
@@ -144,6 +177,7 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
+    "marked": "^14.1.0",
     "minimatch": "^10.0.1"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ title: Store decision records as plain markdown
 status: accepted
 date: 2026-07-04
 deciders: [slawomir]
-supersedes: []
+supersedes: ["0003"]
 tags: [architecture, storage]
 applies-to:
   - "src/core/**"

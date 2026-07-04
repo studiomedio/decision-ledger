@@ -1,10 +1,10 @@
 import * as vscode from 'vscode'
 import type { AdrIndex } from '../core/adrIndex'
 import { findAnchors } from '../core/anchors'
-import { STATUS_ICON, openRecordCommandUri } from '../core/format'
-import type { Adr } from '../types/adr'
+import { STATUS_ICON, openRecordCommandUri, previewCommandUri } from '../core/format'
+import type { Adr, AdrChain } from '../types/adr'
 
-function section(adr: Adr): string {
+function section(adr: Adr, chain: AdrChain): string {
   const lines = [
     `${STATUS_ICON[adr.status]} **ADR-${adr.id} · ${adr.status}**`,
     '',
@@ -15,7 +15,18 @@ function section(adr: Adr): string {
   if (adr.deciders.length) meta.push(adr.deciders.map((d) => `@${d}`).join(', '))
   if (meta.length) lines.push('', `_${meta.join(' · ')}_`)
   if (adr.summary) lines.push('', adr.summary)
-  lines.push('', `[Open record](${openRecordCommandUri(adr.id)})`)
+
+  if (chain.supersedes.length) {
+    lines.push('', `Supersedes: ${chain.supersedes.map((a) => `ADR-${a.id}`).join(', ')}`)
+  }
+  if (chain.supersededBy.length) {
+    lines.push('', `⚠ Superseded by: ${chain.supersededBy.map((a) => `ADR-${a.id}`).join(', ')}`)
+  }
+
+  lines.push(
+    '',
+    `[Open record](${openRecordCommandUri(adr.id)}) · [Preview](${previewCommandUri(adr.id)})`,
+  )
   return lines.join('\n')
 }
 
@@ -29,7 +40,7 @@ export class AdrHoverProvider implements vscode.HoverProvider {
 
     const blocks = anchor.ids.map((id) => {
       const adr = this.index.get(id)
-      return adr ? section(adr) : `$(warning) **ADR-${id}** — not found in the ledger`
+      return adr ? section(adr, this.index.chain(id)) : `$(warning) **ADR-${id}** — not found in the ledger`
     })
 
     const md = new vscode.MarkdownString(blocks.join('\n\n---\n\n'))

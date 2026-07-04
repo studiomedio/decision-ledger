@@ -69,5 +69,6 @@ export function parseAdr(raw: string, uri: Uri, relativePath: string): Adr | nul
     uri,
     relativePath,
     summary: firstParagraph(parsed.content),
+    body: parsed.content.trim(),
   }
 }

@@ -24,4 +24,12 @@ export interface Adr {
   relativePath: string
   /** First non-empty paragraph of the body, for previews. */
   summary: string
+  /** Raw markdown body (frontmatter stripped) — for search and the read view. */
+  body: string
+}
+
+/** A record together with its supersession relationships. */
+export interface AdrChain {
+  supersedes: Adr[]
+  supersededBy: Adr[]
 }
