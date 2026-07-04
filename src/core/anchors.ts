@@ -29,10 +29,26 @@ export function anchorRegex(): RegExp {
   return new RegExp(`(?:${alternation})\\s+((?:\\d+[\\s,]*)+)`, 'gi')
 }
 
+/**
+ * Whether `token` appears in `before` outside of a double-quoted string — i.e.
+ * preceded by an even number of quotes. Stops `// dl:adr` inside a JSON/JSONC
+ * string (or any string literal) being mistaken for a comment.
+ */
+function tokenOutsideString(before: string, token: string): boolean {
+  for (let from = 0; ; ) {
+    const i = before.indexOf(token, from)
+    if (i === -1) return false
+    let quotes = 0
+    for (let j = 0; j < i; j++) if (before[j] === '"') quotes++
+    if (quotes % 2 === 0) return true
+    from = i + 1
+  }
+}
+
 /** Whether the text preceding the keyword on its line opens a comment. */
 function inComment(before: string, markers: CommentMarkers): boolean {
-  for (const line of markers.lines) if (before.includes(line)) return true
-  for (const [open] of markers.blocks) if (before.includes(open)) return true
+  for (const line of markers.lines) if (tokenOutsideString(before, line)) return true
+  for (const [open] of markers.blocks) if (tokenOutsideString(before, open)) return true
   // Block-comment continuation lines, e.g. a JSDoc "*"-prefixed line.
   if (markers.blocks.length && before.trimStart().startsWith('*')) return true
   return false

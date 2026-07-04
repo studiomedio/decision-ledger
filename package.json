@@ -182,9 +182,7 @@
     "build": "node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
-    "package": "vsce package",
-    "publish": "vsce publish",
-    "publish:ovsx": "ovsx publish"
+    "package": "vsce package"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -196,8 +194,7 @@
     "@types/vscode": "^1.85.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.7.0",
-    "@vscode/vsce": "^3.2.0",
-    "ovsx": "^0.10.0"
+    "@vscode/vsce": "^3.2.0"
   },
   "allowScripts": {
     "esbuild@0.25.12": true
