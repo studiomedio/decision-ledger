@@ -1,10 +1,14 @@
 .vscode/**
+.github/**
 src/**
 docs/**
 node_modules/**
 esbuild.js
 tsconfig.json
 PLAN.md
+PUBLISHING.md
+package-lock.json
 **/*.map
 **/*.ts
+**/.DS_Store
 .gitignore

@@ -2,13 +2,22 @@
   "name": "decision-ledger",
   "displayName": "Decision Ledger",
   "description": "Surface Architectural Decision Records in the context of the code they govern.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "studiomedio",
   "license": "MIT",
+  "icon": "media/icon.png",
+  "pricing": "Free",
   "homepage": "https://decisionledger.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/studiomedio/decision-ledger"
+  },
+  "bugs": {
+    "url": "https://github.com/studiomedio/decision-ledger/issues"
+  },
+  "galleryBanner": {
+    "color": "#152640",
+    "theme": "dark"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -173,7 +182,9 @@
     "build": "node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
-    "package": "vsce package"
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "publish:ovsx": "ovsx publish"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -185,7 +196,8 @@
     "@types/vscode": "^1.85.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.7.0",
-    "@vscode/vsce": "^3.2.0"
+    "@vscode/vsce": "^3.2.0",
+    "ovsx": "^0.10.0"
   },
   "allowScripts": {
     "esbuild@0.25.12": true
