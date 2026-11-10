@@ -1,0 +1,88 @@
+# Publishes to the VS Code Marketplace with Trusted Publishing (OIDC): no PAT or repository secret.
+# Must match the publisher's Trusted Publishing policy for this repository: owner studiomedio,
+# workflow publish.yml, no environment. See PUBLISHING.md.
+#
+# Runs when a vX.Y.Z tag is pushed, or by hand (Actions → Publish → Run workflow) from master.
+name: Publish
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      vsix: ${{ steps.package.outputs.vsix }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24 # vsce 4 needs Node 22+; .mts build scripts need 22.18+
+          cache: npm
+
+      - name: Check version
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          case "$GITHUB_REF" in
+            refs/tags/*)
+              if [ "$GITHUB_REF_NAME" != "$version" ]; then
+                echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+                exit 1
+              fi ;;
+            refs/heads/master) ;;
+            *)
+              echo "::error::Publish from master or a vX.Y.Z tag, not $GITHUB_REF"
+              exit 1 ;;
+          esac
+          echo "Publishing $version"
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Package
+        id: package
+        run: |
+          vsix="$(node -p "const p = require('./package.json'); p.name + '-' + p.version").vsix"
+          npx vsce package --out "$vsix"
+          echo "vsix=$vsix" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: ${{ steps.package.outputs.vsix }}
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Only this job can request an OIDC token
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci # installs the locked @vscode/vsce (4.1.0+ is required for --oidc)
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: vsix
+
+      - name: Publish to the Marketplace
+        run: npx vsce publish --oidc --packagePath "${{ needs.build.outputs.vsix }}"
