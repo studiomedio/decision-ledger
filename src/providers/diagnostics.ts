@@ -13,7 +13,7 @@ const STALE: Adr['status'][] = ['superseded', 'deprecated']
 export class DiagnosticsManager implements vscode.Disposable {
   private readonly collection: vscode.DiagnosticCollection
   private readonly disposables: vscode.Disposable[] = []
-  private debounce?: ReturnType<typeof setTimeout>
+  private readonly pending = new Map<string, ReturnType<typeof setTimeout>>()
 
   constructor(private readonly index: AdrIndex) {
     this.collection = vscode.languages.createDiagnosticCollection('decisionLedger')
@@ -23,6 +23,9 @@ export class DiagnosticsManager implements vscode.Disposable {
       vscode.workspace.onDidOpenTextDocument((doc) => this.update(doc)),
       vscode.workspace.onDidCloseTextDocument((doc) => this.collection.delete(doc.uri)),
       vscode.workspace.onDidChangeTextDocument((e) => this.scheduleUpdate(e.document)),
+      vscode.workspace.onDidChangeConfiguration((e) => {
+        if (e.affectsConfiguration('decisionLedger.diagnostics.enabled')) this.refreshAll()
+      }),
     )
   }
 
@@ -37,9 +40,17 @@ export class DiagnosticsManager implements vscode.Disposable {
     for (const doc of vscode.workspace.textDocuments) this.update(doc)
   }
 
+  /** Debounced per document, so typing in one file doesn't drop another file's update */
   private scheduleUpdate(doc: vscode.TextDocument): void {
-    if (this.debounce) clearTimeout(this.debounce)
-    this.debounce = setTimeout(() => this.update(doc), 300)
+    const key = doc.uri.toString()
+    clearTimeout(this.pending.get(key))
+    this.pending.set(
+      key,
+      setTimeout(() => {
+        this.pending.delete(key)
+        this.update(doc)
+      }, 300),
+    )
   }
 
   private update(doc: vscode.TextDocument): void {
@@ -108,7 +119,7 @@ export class DiagnosticsManager implements vscode.Disposable {
   }
 
   dispose(): void {
-    if (this.debounce) clearTimeout(this.debounce)
+    for (const timer of this.pending.values()) clearTimeout(timer)
     for (const d of this.disposables) d.dispose()
   }
 }

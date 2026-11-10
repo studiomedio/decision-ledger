@@ -69,7 +69,7 @@ export class AdrPreview implements vscode.Disposable {
   private chainHtml(id: string): string {
     const { supersedes, supersededBy } = this.index.chain(id)
     const link = (a: Adr) =>
-      `<a href="#" data-id="${a.id}" class="chip">ADR-${a.id} · ${escapeHtml(a.title)}</a>`
+      `<a href="#" data-id="${escapeHtml(a.id)}" class="chip">ADR-${escapeHtml(a.id)} · ${escapeHtml(a.title)}</a>`
     const rows: string[] = []
     if (supersedes.length) rows.push(`<div class="rel"><span>Supersedes</span>${supersedes.map(link).join('')}</div>`)
     if (supersededBy.length) rows.push(`<div class="rel"><span>Superseded by</span>${supersededBy.map(link).join('')}</div>`)
@@ -78,9 +78,7 @@ export class AdrPreview implements vscode.Disposable {
 
   private html(adr: Adr): string {
     const n = nonce()
-    const csp = adr && this.panel
-      ? `default-src 'none'; style-src ${this.panel.webview.cspSource} 'unsafe-inline'; script-src 'nonce-${n}';`
-      : ''
+    const csp = `default-src 'none'; style-src ${this.panel?.webview.cspSource} 'unsafe-inline'; script-src 'nonce-${n}';`
     const body = marked.parse(adr.body, { async: false }) as string
     const meta = [
       adr.date && `<span>${escapeHtml(adr.date)}</span>`,
@@ -116,7 +114,7 @@ export class AdrPreview implements vscode.Disposable {
 </style></head>
 <body>
   <span class="status ${adr.status}">${adr.status}</span>
-  <h1>ADR-${adr.id}: ${escapeHtml(adr.title)}</h1>
+  <h1>ADR-${escapeHtml(adr.id)}: ${escapeHtml(adr.title)}</h1>
   <div class="meta">${meta}</div>
   ${this.chainHtml(adr.id)}
   <button class="open" id="openFile">Open markdown source</button>

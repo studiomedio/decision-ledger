@@ -44,7 +44,8 @@ export class AdrHoverProvider implements vscode.HoverProvider {
     })
 
     const md = new vscode.MarkdownString(blocks.join('\n\n---\n\n'))
-    md.isTrusted = true
+    // Titles and summaries come from repository files: allow only our own command links
+    md.isTrusted = { enabledCommands: ['decisionLedger.openRecord', 'decisionLedger.preview'] }
     md.supportThemeIcons = true
     return new vscode.Hover(md, anchor.range)
   }

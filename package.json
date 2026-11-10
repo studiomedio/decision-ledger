@@ -2,7 +2,7 @@
   "name": "decision-ledger",
   "displayName": "Decision Ledger",
   "description": "Surface Architectural Decision Records in the context of the code they govern.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "studiomedio",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -57,8 +57,13 @@
         },
         "decisionLedger.anchor.keywords": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["dl:adr", "@adr"],
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "dl:adr",
+            "@adr"
+          ],
           "description": "Keywords that mark an inline ADR anchor in a code comment, e.g. `// dl:adr 0042`."
         },
         "decisionLedger.diagnostics.enabled": {
@@ -182,7 +187,9 @@
     "build": "node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
-    "package": "vsce package"
+    "test": "node esbuild.js --test && node --test \"out-test/*.test.js\"",
+    "package": "vsce package",
+    "test:integration": "node esbuild.js && node esbuild.js --integration && node test/integration/run.js"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -190,11 +197,12 @@
     "minimatch": "^10.0.1"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/vscode": "^1.85.0",
-    "esbuild": "^0.25.0",
-    "typescript": "^5.7.0",
-    "@vscode/vsce": "^3.2.0"
+    "@types/node": "^22.20.5",
+    "@types/vscode": "~1.85.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.9.3"
   },
   "allowScripts": {
     "esbuild@0.25.12": true

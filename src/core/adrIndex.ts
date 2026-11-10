@@ -31,26 +31,35 @@ export class AdrIndex implements vscode.Disposable {
 
   /** Full scan of every workspace folder. */
   async refresh(): Promise<void> {
-    this.records.clear()
     const { folder, fileGlob } = config()
     const folders = vscode.workspace.workspaceFolders ?? []
+    const loaded: Adr[] = []
     for (const wf of folders) {
       const pattern = new vscode.RelativePattern(wf, `${folder}/${fileGlob}`)
       const uris = await vscode.workspace.findFiles(pattern)
-      await Promise.all(uris.map((uri) => this.load(uri)))
+      const adrs = await Promise.all(uris.map((uri) => this.read(uri)))
+      loaded.push(...adrs.filter((a): a is Adr => a !== undefined))
     }
+    // Swap in one step so readers never see a half-built index while the scan runs
+    this.records.clear()
+    for (const adr of loaded) this.records.set(adr.id, adr)
     this._onDidChange.fire()
   }
 
-  private async load(uri: vscode.Uri): Promise<void> {
+  private async read(uri: vscode.Uri): Promise<Adr | undefined> {
     try {
       const bytes = await vscode.workspace.fs.readFile(uri)
       const rel = toPosix(vscode.workspace.asRelativePath(uri, false))
-      const adr = parseAdr(decoder.decode(bytes), uri, rel)
-      if (adr) this.records.set(adr.id, adr)
+      return parseAdr(decoder.decode(bytes), uri, rel) ?? undefined
     } catch {
       // Unreadable file — skip; a later change event can pick it up.
+      return undefined
     }
+  }
+
+  private async load(uri: vscode.Uri): Promise<void> {
+    const adr = await this.read(uri)
+    if (adr) this.records.set(adr.id, adr)
   }
 
   private removeByUri(uri: vscode.Uri): void {

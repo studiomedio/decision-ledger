@@ -9,7 +9,7 @@ no Azure DevOps, no CI. This avoids the PAT/Entra machinery entirely.
 2. Build the package:
 
    ```bash
-   cd decision-ledger
+   npm run typecheck && npm test && npm run test:integration
    npm run package          # -> decision-ledger-<version>.vsix
    ```
 
@@ -28,7 +28,7 @@ or two of upload.
 
 ## Pre-flight checklist
 
-- [ ] `npm run typecheck` clean, `npm run build` succeeds.
+- [ ] `npm run typecheck`, `npm test` and `npm run test:integration` pass.
 - [ ] `version` bumped and `CHANGELOG.md` updated.
 - [ ] `npx vsce ls` shows a sane file list (bundled `dist/`, `media/`, `templates/`, README,
       CHANGELOG, LICENSE — no `src/` or `node_modules/`).

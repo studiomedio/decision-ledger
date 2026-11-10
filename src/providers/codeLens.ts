@@ -14,6 +14,9 @@ export class AdrCodeLensProvider implements vscode.CodeLensProvider {
 
   constructor(private readonly index: AdrIndex) {
     index.onDidChange(() => this._onDidChange.fire())
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('decisionLedger.codeLens.enabled')) this._onDidChange.fire()
+    })
   }
 
   provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {

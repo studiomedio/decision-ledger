@@ -11,3 +11,7 @@ package-lock.json
 **/*.ts
 **/.DS_Store
 .gitignore
+out-test/**
+.vscode-test/**
+test/**
+.prettierrc

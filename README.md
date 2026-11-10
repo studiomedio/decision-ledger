@@ -58,12 +58,19 @@ applies-to:
 | `decisionLedger.anchor.keywords` | `["dl:adr", "@adr"]` | Keywords that mark an inline anchor |
 | `decisionLedger.diagnostics.enabled` | `true` | Toggle Problems-panel warnings |
 
-## Develop
+## Development
 
 ```bash
 npm install
-npm run watch      # esbuild in watch mode
-# press F5 in VS Code to launch the Extension Development Host
+npm run watch              # rebuild on change; press F5 to launch the Extension Development Host
+npm run typecheck
+npm test                   # unit tests (src/core, plain Node)
+npm run test:integration   # end-to-end in a downloaded VS Code (cached in .vscode-test/)
+npm run package            # -> decision-ledger-<version>.vsix
 ```
 
-See [PLAN.md](./PLAN.md) for the full roadmap.
+See [PLAN.md](./PLAN.md) for the full roadmap and [PUBLISHING.md](PUBLISHING.md) for releases.
+
+## License
+
+MIT

@@ -4,11 +4,12 @@ import type { AdrIndex } from './core/adrIndex'
 /** Shows how many ADRs govern the active file; click opens a quick pick. */
 export class StatusBar implements vscode.Disposable {
   private readonly item: vscode.StatusBarItem
+  private readonly subscription: vscode.Disposable
 
   constructor(private readonly index: AdrIndex) {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
     this.item.command = 'decisionLedger.showFileDecisions'
-    index.onDidChange(() => this.update())
+    this.subscription = index.onDidChange(() => this.update())
   }
 
   update(): void {
@@ -29,6 +30,7 @@ export class StatusBar implements vscode.Disposable {
   }
 
   dispose(): void {
+    this.subscription.dispose()
     this.item.dispose()
   }
 }

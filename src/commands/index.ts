@@ -3,7 +3,7 @@ import type { AdrIndex } from '../core/adrIndex'
 import type { Adr } from '../types/adr'
 import { nextId, slugify } from '../core/ids'
 import { primaryKeyword } from '../core/anchors'
-import { wrapComment } from '../core/comments'
+import { commentMarkers, wrapComment } from '../core/comments'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder('utf-8')
@@ -121,6 +121,14 @@ function searchAdrs(index: AdrIndex): void {
 async function linkSelection(index: AdrIndex): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) return
+
+  const markers = commentMarkers(editor.document.languageId)
+  if (!markers.lines.length && !markers.blocks.length) {
+    void vscode.window.showInformationMessage(
+      `Decision Ledger: ${editor.document.languageId} files have no comments, so they can't hold an anchor. Use applies-to globs in the record instead.`,
+    )
+    return
+  }
 
   const adrs = index.all()
   if (adrs.length === 0) {
